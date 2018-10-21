@@ -1,0 +1,22 @@
+{
+  "name": "Crypto Chat",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "concurrently  \"node server\" \"webpack --mode development --watch\""
+  },
+  "keywords": ["cryptography", "blockchain", "ara"],
+  "author": "Mark Romano",
+  "license": "ISC",
+  "dependencies": {
+    "ara-crypto": "github:arablocks/ara-crypto",
+    "buffer": "^5.2.1",
+    "express": "^4.16.4",
+    "ws": "^6.1.0"
+  },
+  "devDependencies": {
+    "concurrently": "^4.0.1",
+    "webpack": "^4.21.0",
+    "webpack-cli": "^3.1.2"
+  }
+}

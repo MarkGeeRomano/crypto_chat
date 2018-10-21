@@ -1,0 +1,6 @@
+const crypto = require('ara-crypto')
+const key = Buffer.alloc(32); key.fill('SECRET!KEY')
+const nonce = crypto.randomBytes(24)
+const secret = Buffer.concat([ key, nonce ])
+const buffer = Buffer.from('hello!')
+const boxed = crypto.box(buffer, { secret }) // or crypto.box(buffer, { nonce, key })
