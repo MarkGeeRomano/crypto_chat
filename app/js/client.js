@@ -1,9 +1,24 @@
+import Peer from 'simple-peer'
 import araCrypto from 'ara-crypto'
 import { Buffer } from 'buffer'
 import socket from './socket'
 
+
+
+
+let peer
 export default {
 	Buffer,
+
+	login(username) {
+		socket.send(JSON.stringify({ type: 'LOGIN', username }))
+	},
+
+	initiate(username) {
+		peer = new Peer({ initiator: location.hash === '#1', trickle: false })
+		peer.on('error', (err) => { console.log('error', err) })
+		peer.on('signal', (data) => console.log('SIGNAL', JSON.stringify(data)))
+	},
 
 	makeRandomKeys() {
 		const seed = araCrypto.randomBytes(32)
@@ -18,7 +33,7 @@ export default {
 		const { publicKey, secretKey } = window
 		if (!publicKey || !secretKey) {
 			console.error('You have not created a keypair. Invoke `makeRandomKeys` first')
-			return 
+			return
 		}
 		socket.send(JSON.stringify({
 			from: publicKey,

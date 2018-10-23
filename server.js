@@ -6,13 +6,25 @@ const wss = new Websocket.Server({ port: 8080 })
 
 app.use(express.static('app'))
 
+const users = {}
+
 wss.on('connection', ws => {
   ws.on('message', message => {
-    wss.clients.forEach(client => {
-      if (client !== ws && client.readyState === Websocket.OPEN) {
-        client.send(message);
-      }
-    })
+    message = JSON.parse(message)
+    if (message.type === 'LOGIN') {
+      users[message.username] = ws
+      wss.clients.forEach(client => {
+        if (client !== ws && client.readyState === Websocket.OPEN) {
+          client.send(`${message.username} has connected`)
+        }
+      })
+    } else if (message.type.initialize) {
+      const user = users[message.to]
+      user.send({ request: message.request, sender: message.username })
+    } else {
+      const user = users[message.to]
+      user.send({ response: message.response, sender: message.username })
+    }
   })
 })
 
