@@ -1,23 +1,56 @@
 import Peer from 'simple-peer'
 import araCrypto from 'ara-crypto'
 import { Buffer } from 'buffer'
-import socket from './socket'
 
+const socket = new WebSocket('ws://localhost:8080')
 
+socket.addEventListener('open', () => console.log('Connected to socket on 8080'))
 
+socket.addEventListener('message', ({ data }) => {
+	const _data = JSON.parse(data)
+	if (_data.type === 'LOGIN') {
+		console.log(_data.info)
+	} else if (_data.type === 'INIT_REQUEST') {
+		console.log(_data.load)
+		peer = new Peer({ initiator: false, trickle: false })
+		peer.on('signal', signal => socket.send(JSON.stringify({
+			username,
+			load: signal,
+			type: 'ACCEPT'
+		})))
+		
+		// const { from, message, signature } = JSON.parse(data)
+		// const verified = araCrypto.verify(Buffer(signature.data), Buffer(message), Buffer(from))
+		// !verified && console.error('The following message appears to be forged 😬')
+		// console.log(JSON.stringify({
+		// 	from: Buffer(from).toString('hex'),
+		// 	message
+		// }, null, 2))
+	}
+})
 
 let peer
+let username
 export default {
 	Buffer,
 
-	login(username) {
+	login(_username) {
+		username = _username
 		socket.send(JSON.stringify({ type: 'LOGIN', username }))
 	},
 
-	initiate(username) {
-		peer = new Peer({ initiator: location.hash === '#1', trickle: false })
-		peer.on('error', (err) => { console.log('error', err) })
-		peer.on('signal', (data) => console.log('SIGNAL', JSON.stringify(data)))
+	initiate(to) {
+		if (!username) { return console.log('Login first!') }
+		peer = new Peer({ initiator: true, trickle: false })
+		peer.on('error', (err) => console.log('error', err))
+		peer.on('signal', data => {
+			socket.send(JSON.stringify({
+				type: 'INIT',
+				username,
+				to,
+				request: data
+			}))
+		})
 	},
 
 	makeRandomKeys() {

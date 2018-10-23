@@ -12,15 +12,21 @@ wss.on('connection', ws => {
   ws.on('message', message => {
     message = JSON.parse(message)
     if (message.type === 'LOGIN') {
+      console.log(`${message.username} logging in`)
       users[message.username] = ws
       wss.clients.forEach(client => {
         if (client !== ws && client.readyState === Websocket.OPEN) {
-          client.send(`${message.username} has connected`)
+          console.log('!')
+          client.send(JSON.stringify({ type: 'LOGIN', info: `${message.username} has connected` }))
         }
       })
-    } else if (message.type.initialize) {
+    } else if (message.type === 'INIT') {
       const user = users[message.to]
-      user.send({ request: message.request, sender: message.username })
+      user.send(JSON.stringify({
+        type: 'INIT_REQUEST',
+        load: message.request, 
+        sender: message.username 
+      }))
     } else {
       const user = users[message.to]
       user.send({ response: message.response, sender: message.username })
