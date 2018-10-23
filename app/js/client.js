@@ -3,6 +3,7 @@ import { Buffer } from 'buffer'
 import socket from './socket'
 
 export default {
+	socket,
 	Buffer,
 
 	makeRandomKeys() {
