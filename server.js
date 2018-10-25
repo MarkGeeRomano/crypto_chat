@@ -28,7 +28,7 @@ wss.on('connection', ws => {
         sender: message.username
       }))
     } else if (message.type === 'ACCEPT') {
-      console.log('ACCEPT')
+      console.log('ACCEPT') 
       const user = users[message.to]
       user.send(JSON.stringify({
         load: message.load,
